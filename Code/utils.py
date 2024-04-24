@@ -4,7 +4,7 @@ Various functions used to work with the KB
 
 import sympy as s
 
-def Conjunction(expression:list)->list:
+def Conjunction(expression:list[s.core.symbol.Symbol])->list[s.core.symbol.Symbol]:
     """
         Conjunction := logical AND (v)
         Input: list of expressions
@@ -13,7 +13,7 @@ def Conjunction(expression:list)->list:
 
     return _Split(expression, s.And)
 
-def Disjunction(expression:list)->list: 
+def Disjunction(expression:list[s.core.symbol.Symbol])->list[s.core.symbol.Symbol]: 
     """
         Disjunction := logical OR (^)
         Input: list of expressions
@@ -22,7 +22,7 @@ def Disjunction(expression:list)->list:
 
     return _Split(expression, s.Or)
 
-def _Split(expression:list, LogicalOperation)->list:
+def _Split(expression:list[s.core.symbol.Symbol], LogicalOperation:s.core.symbol.Symbol)->list[s.core.symbol.Symbol]:
     """
         Splits the characters from the logical operation
         Input: list of expressions and logical operation
@@ -45,7 +45,7 @@ def _Split(expression:list, LogicalOperation)->list:
 
     return output
 
-def DoubleImplication(left_part:list, right_part:list)->list:
+def DoubleImplication(left_part:list[s.core.symbol.Symbol], right_part:list[s.core.symbol.Symbol])->list[s.core.symbol.Symbol]:
     """
         Implement double implication <=>
         Input: left side and right side of the expression
@@ -54,7 +54,7 @@ def DoubleImplication(left_part:list, right_part:list)->list:
 
     return (s.Implies(left_part, right_part) & s.Implies(right_part, left_part))
 
-def Connect(expression:list, operator)->list:
+def Connect(expression:list[s.core.symbol.Symbol], operator:s.core.symbol.Symbol)->list[s.core.symbol.Symbol]:
     """
         Connects expressions with a given operator
         Input: expression and operator
@@ -72,7 +72,7 @@ def Connect(expression:list, operator)->list:
 
     return result
 
-def Remove(my_list:list, element)->list:
+def Remove(my_list:list[s.core.symbol.Symbol], element:s.core.symbol.Symbol)->list[s.core.symbol.Symbol]:
     """
         Removes a given element from the list
         Input: list and element

@@ -10,9 +10,9 @@ print("-------------------")
 print("Testing the Logical Entailment")
 print("-------------------")
 
-A=s.Symbol("A")
-B=s.Symbol("B")
-C=s.Symbol("C")
+A = s.Symbol("A")
+B = s.Symbol("B")
+C = s.Symbol("C")
 
 # Test 1: is the formula true in the KB?
 print("Test 1:")
@@ -48,7 +48,8 @@ print("Result: ", Entailment(KB,formula))
 print("-------------------")
 
 """
-    Test 2
+    Test 2 Contraction
+    Contraction is a process in which a knowledge base is updated by removing or revising its contents in response to new information or observations.
 """
 
 print("Testing the Contraction")
@@ -71,9 +72,15 @@ print("Intial belief base:")
 show_beliefs(KB)
 print("Contracting of B, order 0:")
 KB_new = Contract(KB, B, 0)
-print("Resulting Knowledge base: ")
+print("Resulting Knowledge Base: ")
 show_beliefs(KB_new)
 print("-------------------")
+
+"""
+    Test 3: Revision
+    Logical revision is a process of updating a knowledge base in response to new information while maintaining consistency. 
+    It involves revising the existing beliefs or statements in the knowledge base to incorporate the new information without leading to contradictions.
+"""
 
 # print("\n\n")
 # print("Result  from test 2: Revision")
@@ -84,3 +91,8 @@ print("-------------------")
 # print("Result  from test 3: Contract")
 # KB_new = contract(KB_new, ~P, 0.0)
 # show_beliefs(KB_new)
+
+"""
+    Test 4: Expansion
+    Logical expansion is the process of adding new information to a knowledge base while ensuring that the resulting expanded knowledge base remains consistent and coherent. Logical expansion focuses on incorporating entirely new information into the knowledge base.
+"""
