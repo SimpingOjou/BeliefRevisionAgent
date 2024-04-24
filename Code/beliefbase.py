@@ -42,7 +42,7 @@ def Resolve(clause_1:list, clause_2:list)->list:
 
     return new_clause
 
-def Entailment(KB, prove):
+def Entailment(KB:list, prove):
     """
         Entailment := contradictions in the knowledge base
         Checks and deals for entailment with the Resolution Method. In this method, we negate the formula we want to check for entailment and then perform resolution with the negation of the formula and the knowledge base. If we arrive at an empty clause (i.e., a contradiction), then the formula is entailed by the knowledge base.
@@ -50,21 +50,21 @@ def Entailment(KB, prove):
 
     clauses = []
 
-    #Step 1: Take the elements of the KB in CNF 
-    for i in KB:
-        knowledge_cnf = s.to_cnf(i)
+    # Transform into CNF
+    for term in KB:
+        knowledge_cnf = s.to_cnf(term)
         knowledge_literals = Conjunction(knowledge_cnf)
         
         for x in range(len(knowledge_literals)):
             clauses.append(knowledge_literals[x])
 
-    #Step 2: Add to the clauses the contradiction(opposite) of the formula
+    # Formula negation
     Not_Formula_CNF = Conjunction(s.to_cnf(~prove))
 
     for i in range(len(Not_Formula_CNF)):
         clauses.append(Not_Formula_CNF[i])
 
-    #Step 3:Resolve the clauses
+    # Clause resolution
     for i in range(len(clauses)):
         for j in range(i + 1,len(clauses)):
             new_clause = Resolve(clauses[i],clauses[j])  
@@ -73,10 +73,11 @@ def Entailment(KB, prove):
                 if x not in clauses:
                     clauses.append(x)
 
+    # Check for entailment on the clauses
     if 0 in clauses:
         return True
-    else:
-        return False
+    
+    return False
     
 def show_beliefs(KB):
     """
