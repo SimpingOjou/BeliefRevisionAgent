@@ -59,23 +59,21 @@ P = s.Symbol("P") # Is prepared
 B = s.Symbol("B")
 Q = s.Symbol("Q")
 
-KB_1=DoubleImplication(R,P|L)    
-KB_2=~R # Robert does NOT do well in exam
+KB_1 = DoubleImplication(R, P | L)    
+KB_2 = ~R # Robert does NOT do well in exam
 
 KB=[Belief(KB_1, 1.0), Belief(KB_2, 1.0), Belief(B, 0.5)]
-formula=~P# What I want to entail from the KB
+formula = ~P # What I want to entail from the KB
 formula2 = R
 formula3 = B
 
-print("-------------------")
-print("Intial belief base")
+print("Intial belief base:")
 show_beliefs(KB)
-print("-------------------")
-print("\n\nContracting B, order 0...\n\n")
+print("Contracting of B, order 0:")
 KB_new = Contract(KB, B, 0)
-print("-------------------")
-print("Result from test 1: Contract")
+print("Resulting Knowledge base: ")
 show_beliefs(KB_new)
+print("-------------------")
 
 # print("\n\n")
 # print("Result  from test 2: Revision")
@@ -86,5 +84,3 @@ show_beliefs(KB_new)
 # print("Result  from test 3: Contract")
 # KB_new = contract(KB_new, ~P, 0.0)
 # show_beliefs(KB_new)
-
-# print(entailment(KB,formula))import sympy as s
