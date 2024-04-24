@@ -1,5 +1,7 @@
-from beliefbase import *
-from utils import *
+import sympy as s
+
+from beliefbase import Belief, Entailment, Contract, Revise, Expand, show_beliefs
+from utils import DoubleImplication
 
 """
     Test 1 (Testing entailment)
