@@ -1,0 +1,61 @@
+--------------------------------------
+Testing the Logical Entailment
+--------------------------------------
+Test 1:
+Knowledge base: A => B, A & C
+Formula: A & B & C
+Result:  True
+--------------------------------------
+Test 2:
+Knowledge base: A <=> ~C, C | ~B
+Formula: ~A
+Result:  False
+--------------------------------------
+Test 3:
+Knowledge base: A <=> (B | C), ~A
+Formula: B & C
+Result:  False
+
+--------------------------------------
+Testing the Contraction
+--------------------------------------
+Intial belief base:
+Formula [1]:  (Implies(R, L | P)) & (Implies(L | P, R)) Order:  1
+Formula [2]:  ~R Order:  1
+Formula [3]:  B Order:  0.5
+Contracting of B, order 0:
+Resulting Knowledge Base: 
+Formula [1]:  (Implies(R, L | P)) & (Implies(L | P, R)) Order:  1
+Formula [2]:  ~R Order:  1
+
+--------------------------------------
+Testing the Revision
+--------------------------------------
+Current belief base:
+Formula [1]:  (Implies(R, L | P)) & (Implies(L | P, R)) Order:  1
+Formula [2]:  ~R Order:  1
+Revising of B, order 0.25:
+Formula [1]:  (Implies(R, L | P)) & (Implies(L | P, R)) Order:  1
+Formula [2]:  ~R Order:  1
+Formula [3]:  B Order:  1
+
+--------------------------------------
+Testing the Expansion
+--------------------------------------
+Current belief base:
+Formula [1]:  (Implies(R, L | P)) & (Implies(L | P, R)) Order:  1
+Formula [2]:  ~R Order:  1
+Formula [3]:  B Order:  1
+Revising of B, order 0.25:
+Formula [1]:  (Implies(R, L | P)) & (Implies(L | P, R)) Order:  1
+Formula [2]:  ~R Order:  1
+Formula [3]:  B Order:  1
+Formula [4]:  ~B Order:  0.25
+
+======================================
+Testing the Revision with contradiction
+======================================
+Formula [1]:  P Order:  0.75
+Formula [2]:  Q Order:  0.5
+Formula [1]:  P Order:  0.75
+Formula [2]:  ~Q Order:  1

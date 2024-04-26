@@ -1,6 +1,7 @@
 """
-Knowledge base class and functions
-"""
+    Knowledge base class and functions
+""" 
+
 import sympy as s
 from decimal import Decimal
 from utils import Conjunction, Disjunction, DoubleImplication, Connect, Remove
@@ -12,7 +13,11 @@ class Belief:
     """
     def __init__(self, formula:s.core.symbol.Symbol = None, order:float = None)->None:
         self.formula = formula # logical expression
-        self.order = Decimal(order) # plausibility order
+        self.order = Decimal(order) # firmness of belief
+
+"""
+    Public functions that can be used outside of beliefbase
+"""
 
 def Resolve(clause_1:list[s.core.symbol.Symbol], clause_2:list[s.core.symbol.Symbol])->list[s.core.symbol.Symbol]:
     """
@@ -78,13 +83,96 @@ def Entailment(KB:list[s.core.symbol.Symbol], prove:s.core.symbol.Symbol)->bool:
     
     return False
     
-def show_beliefs(KB:list[s.core.symbol.Symbol])->None:
+def Show_beliefs(KB:list[s.core.symbol.Symbol])->None:
     """
         Prints the belief and the order of each belief in the KB
     """
 
-    for belief in KB:
-        print("Formula: ", belief.formula, "Order: ", belief.order)
+    for i,belief in enumerate(KB):
+        print("Formula ["+ str(i+1) +"]: ", belief.formula, "Order: ", belief.order)
+
+def Expand(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float, add_on_finish:bool = True)->list[s.core.symbol.Symbol]:
+    """
+        Logical expansion is the process of adding new information to a knowledge base. Logical expansion focuses on incorporating entirely new information into the knowledge base.
+    """
+    cnf_formula = s.to_cnf(formula)
+    order_of_entrenchment = Decimal(order)
+    belief_queue = []
+    
+    if not Entailment([], ~(s.to_cnf(formula))):
+        if Entailment([], ~(s.to_cnf(formula))):
+            order = Decimal(1)
+        else:
+            for belief in KB:
+                kb_formula = belief.formula
+
+                if belief.order > order: 
+                    continue  
+
+                d = _entrenchment_degree(KB, s.Implies(cnf_formula, kb_formula))
+
+                if Entailment([], DoubleImplication(cnf_formula, kb_formula)) or belief.order <= order < d:
+                    belief_queue.append((belief, Decimal(order)))
+
+            KB_new = _reorder_belief_queue(KB, belief_queue)
+
+        if add_on_finish:
+            KB_new = _assert_belief(KB_new, cnf_formula, order_of_entrenchment)
+
+    return KB_new
+
+def Contract(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float)->list[s.core.symbol.Symbol]:
+    """
+        Contraction is a process in which a knowledge base is updated by removing or revising its contents in response to new information or observations.
+        When new information contradicts existing beliefs in the knowledge base, contraction involves adjusting the knowledge base to accommodate the new information while preserving consistency and minimizing the loss of existing information.
+    """
+
+    x = s.to_cnf(formula)
+    belief_queue = []
+    order = Decimal(order)
+
+    if not 0 <= order <= 1:
+        raise ValueError
+
+    for kb_formula in KB:
+        y = kb_formula.formula
+
+        if (order < kb_formula.order) and (_entrenchment_degree(KB, x) == _entrenchment_degree(KB, Connect([x, y], s.Or)[0])):
+            belief_queue.append((kb_formula, order))
+
+    return _reorder_belief_queue(KB, belief_queue)
+
+def Revise(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float)->list[s.core.symbol.Symbol]:
+    """
+        Logical revision is a process of updating a knowledge base in response to new information while maintaining consistency. 
+        It involves revising the existing beliefs or statements in the knowledge base to incorporate the new information without leading to contradictions.
+    """
+
+    cnf_formula = s.to_cnf(formula)
+    order_of_entrenchment = Decimal(order)
+    degree_of_formula = _entrenchment_degree(KB, cnf_formula)
+    KB_new = KB.copy()
+    
+    if not Entailment([], ~cnf_formula):
+        # If an empty set of clauses entails ~cnf_formula is true, 
+        # it is a contradiction since ~cnf_formula is always true
+
+        if Entailment([], cnf_formula):
+            # if cnf_formula is true for an empty set of clauses, then it is a tautology
+            # i.e. cnf_formula is always true
+            order = Decimal(1)
+        elif order_of_entrenchment <= degree_of_formula:
+            Contract(KB, cnf_formula, order)
+        else:
+            # Levi identity
+            KB_contr = Contract(KB, ~cnf_formula, Decimal(0))
+            KB_new = Expand(KB_contr, cnf_formula, order_of_entrenchment, add_on_finish=True)
+            
+    return KB_new
+
+"""
+    Private functions used inside beliefbase
+"""
 
 def _assert_belief(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float):
     """
@@ -116,6 +204,10 @@ def _retract_belief(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol)
     return KB_new
 
 def _iterate_by_entrenchment(KB:list[s.core.symbol.Symbol]):
+    """
+        Groups beliefs in the knowledge base by their order, and for each group of beliefs with the same order, it yields the order along with the corresponding list of beliefs
+    """
+
     result = []
     last_order = None
 
@@ -165,80 +257,4 @@ def _reorder_belief_queue(KB:list[s.core.symbol.Symbol], belief_queue:list[s.cor
             formula.order = order
             KB_new.append(formula)
 
-    return KB_new
-
-def Expand(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float, add_on_finish:bool = True)->list[s.core.symbol.Symbol]:
-    """
-        Logical expansion is the process of adding new information to a knowledge base while ensuring that the resulting expanded knowledge base remains consistent and coherent. Logical expansion focuses on incorporating entirely new information into the knowledge base.
-    """
-    cnf_formula = s.to_cnf(formula)
-    belief_queue = []
-    order_of_entrenchment = Decimal(order)
-    
-    if not Entailment([], ~(s.to_cnf(formula))):
-        if Entailment([], ~(s.to_cnf(formula))):
-            order = Decimal(1)
-        else:
-            for belief in KB:
-                kb_formula = belief.formula
-
-                if belief.order > order: 
-                    continue  
-
-                d = _entrenchment_degree(KB, s.Implies(cnf_formula, kb_formula))
-
-                if Entailment([], DoubleImplication(cnf_formula, kb_formula)) or belief.order <= order < d:
-                    belief_queue.append((belief, Decimal(order)))
-
-            KB_new = _reorder_belief_queue(KB, belief_queue)
-
-        if add_on_finish:
-            KB_new = _assert_belief(KB_new, cnf_formula, order_of_entrenchment)
-
-    return KB_new
-
-def Contract(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float)->list[s.core.symbol.Symbol]:
-    """
-        Contraction is a process in which a knowledge base is updated by removing or revising its contents in response to new information or observations.
-        When new information contradicts existing beliefs in the knowledge base, contraction involves adjusting the knowledge base to accommodate the new information while preserving consistency and minimizing the loss of existing information.
-    """
-    x = s.to_cnf(formula)
-    belief_queue = []
-    order = Decimal(order)
-
-    if not 0 <= order <= 1:
-        raise ValueError
-    
-    for kb_formula in KB:
-        y = kb_formula.formula
-        
-        if order < kb_formula.order and _entrenchment_degree(KB, x) == _entrenchment_degree(KB, Connect([x, y], s.Or)[0]):
-            belief_queue.append((kb_formula, order))
-    
-    return _reorder_belief_queue(KB, belief_queue)
-
-def Revise(KB:list[s.core.symbol.Symbol], formula:s.core.symbol.Symbol, order:float)->list[s.core.symbol.Symbol]:
-    """
-        Logical revision is a process of updating a knowledge base in response to new information while maintaining consistency. 
-        It involves revising the existing beliefs or statements in the knowledge base to incorporate the new information without leading to contradictions.
-    """
-    cnf_formula = s.to_cnf(formula)
-    order_of_entrenchment = Decimal(order)
-    degree_of_formula = _entrenchment_degree(KB, cnf_formula)
-    KB_new = KB.copy()
-    
-    if not Entailment([], ~cnf_formula):
-        # If an empty set of clauses entails ~cnf_formula is true, 
-        # it is a contradiction since ~cnf_formula is always true
-        if Entailment([], cnf_formula):
-            # if cnf_formula is true for an empty set of clauses, then it is a tautology
-            # i.e. cnf_formula is always true
-            order = Decimal(1)
-        elif order_of_entrenchment <= degree_of_formula:
-            Contract(KB, cnf_formula, order)
-        else:
-            # Levi identity
-            KB_contr = Contract(KB, ~cnf_formula, Decimal(0))
-            KB_new = Expand(KB_contr, cnf_formula, order_of_entrenchment, add_on_finish=False)
-            
     return KB_new

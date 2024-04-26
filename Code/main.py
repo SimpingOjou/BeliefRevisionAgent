@@ -1,6 +1,6 @@
 import sympy as s
 
-from beliefbase import Belief, Entailment, Contract, Revise, Expand, show_beliefs
+from beliefbase import Belief, Entailment, Contract, Revise, Expand, Show_beliefs
 from utils import DoubleImplication
 
 """
@@ -8,9 +8,9 @@ from utils import DoubleImplication
     Entailment of a formula in a knowledge base refers to the logical consequence relationship between the knowledge base and the formula. Formally, a formula F is said to be entailed by a knowledge base KB if and only if, in every model (or interpretation) where all the sentences in KB are true, F is also true.
 """
 
-print("-------------------")
+print("--------------------------------------")
 print("Testing the Logical Entailment")
-print("-------------------")
+print("--------------------------------------")
 
 A = s.Symbol("A")
 B = s.Symbol("B")
@@ -25,7 +25,7 @@ KB2 = A & C
 KB = [KB1, KB2]
 formula = A & B & C
 print("Result: ", Entailment(KB,formula))
-print("-------------------")
+print("--------------------------------------")
 
 # Test 2
 print("Test 2:")
@@ -36,7 +36,7 @@ KB2 = C | (~B)
 KB = [KB1, KB2]
 formula = ~A
 print("Result: ", Entailment(KB,formula))
-print("-------------------")
+print("--------------------------------------")
 
 # Test 3
 print("Test 3:")
@@ -47,15 +47,13 @@ KB2 = ~A
 KB = [KB1, KB2]
 formula = B & C
 print("Result: ", Entailment(KB,formula))
-print("-------------------")
+print("--------------------------------------")
 
 """
     Test 2 Contraction
     Contraction is a process in which a knowledge base is updated by removing or revising its contents in response to new information or observations.
 """
 
-print("Testing the Contraction")
-print("-------------------")
 R = s.Symbol("R") # Robert does well in exam
 L = s.Symbol("L") # Is Lucky
 P = s.Symbol("P") # Is prepared
@@ -65,18 +63,20 @@ Q = s.Symbol("Q")
 KB_1 = DoubleImplication(R, P | L)    
 KB_2 = ~R # Robert does NOT do well in exam
 
-KB=[Belief(KB_1, 1.0), Belief(KB_2, 1.0), Belief(B, 0.5)]
+KB = [Belief(KB_1, 1.0), Belief(KB_2, 1.0), Belief(B, 0.5)]
 formula = ~P # What I want to entail from the KB
 formula2 = R
 formula3 = B
 
+print("Testing the Contraction")
+print("--------------------------------------")
 print("Intial belief base:")
-show_beliefs(KB)
+Show_beliefs(KB)
 print("Contracting of B, order 0:")
-KB_new = Contract(KB, B, 0)
+KB_contracted = Contract(KB, formula3, 0)
 print("Resulting Knowledge Base: ")
-show_beliefs(KB_new)
-print("-------------------")
+Show_beliefs(KB_contracted)
+print("--------------------------------------")
 
 """
     Test 3: Revision
@@ -84,17 +84,35 @@ print("-------------------")
     It involves revising the existing beliefs or statements in the knowledge base to incorporate the new information without leading to contradictions.
 """
 
-# print("\n\n")
-# print("Result  from test 2: Revision")
-# KB_new = revise(KB_new, formula3, 0.25)
-# show_beliefs(KB_new)
-
-# print("\n\n")
-# print("Result  from test 3: Contract")
-# KB_new = contract(KB_new, ~P, 0.0)
-# show_beliefs(KB_new)
+print("Testing the Revision")
+print("--------------------------------------")
+print("Current belief base:")
+Show_beliefs(KB_contracted)
+print("Revising of B, order 0.25:")
+KB_revised = Revise(KB_contracted, formula3, 1)
+Show_beliefs(KB_revised)
+print("--------------------------------------")
 
 """
     Test 4: Expansion
-    Logical expansion is the process of adding new information to a knowledge base while ensuring that the resulting expanded knowledge base remains consistent and coherent. Logical expansion focuses on incorporating entirely new information into the knowledge base.
+    Logical expansion is the process of adding new information to a knowledge base. Logical expansion focuses on incorporating entirely new information into the knowledge base.
 """
+
+print("Testing the Expansion")
+print("--------------------------------------")
+print("Current belief base:")
+Show_beliefs(KB_revised)
+print("Revising of B, order 0.25:")
+KB_expanded = Expand(KB_revised, ~formula3, 0.25)
+Show_beliefs(KB_expanded)
+
+# Textbook example of revision
+print("======================================")
+print("Testing the Revision with contradiction")
+print("======================================")
+KB = [Belief(s.Symbol('P'), 0.75), Belief(s.Symbol('Q'), 0.5)]
+Show_beliefs(KB)
+Q = s.Symbol('Q')
+formula = ~Q
+KB_revised = Revise(KB, formula, 1)
+Show_beliefs(KB_revised)
