@@ -54,9 +54,9 @@ print("--------------------------------------")
     Contraction is a process in which a knowledge base is updated by removing or revising its contents in response to new information or observations.
 """
 
-R = s.Symbol("R") # Robert does well in exam
-L = s.Symbol("L") # Is Lucky
-P = s.Symbol("P") # Is prepared
+R = s.Symbol("R") 
+L = s.Symbol("L") 
+P = s.Symbol("P") 
 B = s.Symbol("B")
 Q = s.Symbol("Q")
 
@@ -64,16 +64,14 @@ KB_1 = DoubleImplication(R, P | L)
 KB_2 = ~R # Robert does NOT do well in exam
 
 KB = [Belief(KB_1, 1.0), Belief(KB_2, 1.0), Belief(B, 0.5)]
-formula = ~P # What I want to entail from the KB
-formula2 = R
-formula3 = B
+formula = B
 
 print("Testing the Contraction")
 print("--------------------------------------")
 print("Intial belief base:")
 Show_beliefs(KB)
 print("Contracting of B, order 0:")
-KB_contracted = Contract(KB, formula3, 0)
+KB_contracted = Contract(KB, formula, 0)
 print("Resulting Knowledge Base: ")
 Show_beliefs(KB_contracted)
 print("--------------------------------------")
@@ -89,7 +87,7 @@ print("--------------------------------------")
 print("Current belief base:")
 Show_beliefs(KB_contracted)
 print("Revising of B, order 0.25:")
-KB_revised = Revise(KB_contracted, formula3, 1)
+KB_revised = Revise(KB_contracted, formula, 1)
 Show_beliefs(KB_revised)
 print("--------------------------------------")
 
@@ -103,7 +101,7 @@ print("--------------------------------------")
 print("Current belief base:")
 Show_beliefs(KB_revised)
 print("Revising of B, order 0.25:")
-KB_expanded = Expand(KB_revised, ~formula3, 0.25)
+KB_expanded = Expand(KB_revised, ~formula, 0.25)
 Show_beliefs(KB_expanded)
 
 # Textbook example of revision
@@ -112,7 +110,6 @@ print("Testing the Revision with contradiction")
 print("======================================")
 KB = [Belief(s.Symbol('P'), 0.75), Belief(s.Symbol('Q'), 0.5)]
 Show_beliefs(KB)
-Q = s.Symbol('Q')
 formula = ~Q
 KB_revised = Revise(KB, formula, 1)
 Show_beliefs(KB_revised)
