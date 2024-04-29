@@ -24,7 +24,7 @@ def Resolve(clause_1:list[s.core.symbol.Symbol], clause_2:list[s.core.symbol.Sym
         Every clause has a disjunction (|) between its literals (Symbol).
         The function resolves given two clauses
     """
-
+#
     new_clause = []
     literals_1 = Disjunction(clause_1) 
     literals_2 = Disjunction(clause_2)
